@@ -47,21 +47,21 @@ pipeline {
                 script {
                     if (env.GIT_BRANCH == 'main') {
                         sh '''
-                            CONTAINERS=$(docker ps -q --filter \"ancestor=${env.DOCKER_IMAGE_MAIN}\")
+                            CONTAINERS=$(docker ps -q --filter \"ancestor=${DOCKER_IMAGE_MAIN}\")
                             if [ -n "$CONTAINERS" ]; then
                                 docker stop $CONTAINERS
                                 docker rm $CONTAINERS
                             fi
-                            docker run -d --expose 3000 -p 3000:3000 ${env.DOCKER_IMAGE_MAIN}
+                            docker run -d --expose 3000 -p 3000:3000 ${DOCKER_IMAGE_MAIN}
                         '''
                     } else if (env.GIT_BRANCH == 'dev') {
                         sh '''
-                            CONTAINERS=$(docker ps -q --filter \"ancestor=${env.DOCKER_IMAGE_DEV}\")
+                            CONTAINERS=$(docker ps -q --filter \"ancestor=${DOCKER_IMAGE_DEV}\")
                             if [ -n "$CONTAINERS" ]; then
                                 docker stop $CONTAINERS
                                 docker rm $CONTAINERS
                             fi
-                            docker run -d --expose 3001 -p 3001:3000 ${env.DOCKER_IMAGE_DEV}
+                            docker run -d --expose 3001 -p 3001:3000 ${DOCKER_IMAGE_DEV}
                         '''
                     }
                 }
