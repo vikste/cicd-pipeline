@@ -45,12 +45,24 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh 'docker stop $(docker ps -aq) || true'
-                    sh 'docker rm $(docker ps -aq) || true'
                     if (env.GIT_BRANCH == 'main') {
-                        sh "docker run -d --expose 3000 -p 3000:3000 ${env.DOCKER_IMAGE_MAIN}"
+                        sh '''
+                           CONTAINERS=$(docker ps -q --filter "ancestor=${env.DOCKER_IMAGE_MAIN}")
+                           if [ -n "$CONTAINERS" ]; then
+                               docker stop $CONTAINERS
+                               docker rm $CONTAINERS
+                           fi
+                           docker run -d --expose 3000 -p 3000:3000 ${env.DOCKER_IMAGE_MAIN}
+                        '''
                     } else if (env.GIT_BRANCH == 'dev') {
-                        sh "docker run -d --expose 3001 -p 3001:3000 ${env.DOCKER_IMAGE_DEV}"
+                        sh '''
+                           CONTAINERS=$(docker ps -q --filter "ancestor=${env.DOCKER_IMAGE_DEV}")
+                           if [ -n "$CONTAINERS" ]; then
+                               docker stop $CONTAINERS
+                               docker rm $CONTAINERS
+                           fi
+                           docker run -d --expose 3000 -p 3001:3000$ {env.DOCKER_IMAGE_DEV}
+                        '''
                     }
                 }
             }
